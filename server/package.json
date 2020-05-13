@@ -1,0 +1,52 @@
+{
+  "name": "gandalf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node lib/api/main.js",
+    "start:watch": "nodemon",
+    "tslint": "tslint -c tslint.json --project tsconfig.json",
+    "build": "rm -rf lib && npm run transpile",
+    "transpile": "tsc ",
+    "bic": "build-if-changed",
+    "prettier": "prettier  --write './src/**/*.ts'",
+    "pre-commit-prettier": "prettier --check './src/**/*.ts'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.675.0",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-json": "^2.0.2",
+    "koa-router": "^8.0.8"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.11.3",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-json": "^2.0.18",
+    "@types/koa-router": "^7.4.0",
+    "build-if-changed": "^1.5.5",
+    "husky": "^4.2.5",
+    "nodemon": "^2.0.3",
+    "prettier": "^2.0.5",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.2"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts"
+    ],
+    "watch": [
+      "src"
+    ],
+    "exec": "npm run bic && npm run start",
+    "ext": "ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run tslint && npm run pre-commit-prettier && npm run transpile"
+    }
+  }
+}
