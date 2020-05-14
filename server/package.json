@@ -20,6 +20,7 @@
   "dependencies": {
     "@types/knex": "^0.16.1",
     "aws-sdk": "^2.675.0",
+    "bluebird": "^3.7.2",
     "db-migrate": "^0.11.11",
     "db-migrate-pg": "^1.2.2",
     "knex": "^0.21.1",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",
+    "@types/bluebird": "^3.5.30",
     "@types/koa": "^2.11.3",
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-json": "^2.0.18",

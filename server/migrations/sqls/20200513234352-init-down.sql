@@ -1,1 +1,2 @@
-/* Replace with your SQL commands */
+drop table tags;
+drop table gifs;
