@@ -1,15 +1,15 @@
 import * as Knex from "knex";
-//import config from "../config";
+import config from "../config";
 
 export type Connection = Knex;
 
 export const conn = Knex({
   client: "pg",
   connection: {
-    host: "127.0.0.1",
-    user: "gandalf",
-    password: "gandalf",
-    database: "gandalf",
-    port: 8400,
+    user: config.db.user,
+    password: config.db.password,
+    database: config.db.database,
+    port: config.db.port,
+    host: config.db.host
   },
 });

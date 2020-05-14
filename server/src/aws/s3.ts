@@ -1,5 +1,4 @@
 import { S3 } from "aws-sdk";
-import { map } from "bluebird";
 import config from "../config";
 import { GifMetadata } from "../types/gif";
 import { WIZARD_BUCKET } from "./constants";
@@ -33,19 +32,4 @@ export async function getGifMetadata(): Promise<GifMetadata[]> {
     console.error("Failed to retreive gif metadata", e);
     return [];
   }
-}
-
-export async function getGifs(filenames: string[]): Promise<void> {
-  const gifs = await map(
-    filenames,
-    async (name: string) => {
-      const params = {
-        Bucket: WIZARD_BUCKET,
-        Key: "gifs/" + name,
-      };
-      await s3.getObject(params);
-    },
-    { concurrency: 10 }
-  );
-  gifs;
 }

@@ -1,13 +1,19 @@
 export interface Config {
   port: number;
+  aws: {
+    accessKey: string;
+    secretAccessKey: string;
+  };
+  db: {
+    host: string;
+    user: string;
+    password: string;
+    database: string;
+    port: number;
+  };
 }
 
-//TODO read this in from json
-//add db creds
-//add aws keys(maybe)
-
-const config: Config = {
-  port: 3000,
-};
+//TODO read in AWS keys as env vars
+const config: Config = require("../config.json");
 
 export default config;

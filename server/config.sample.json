@@ -1,8 +1,22 @@
 {
   "port": 3000,
+  "aws": {
+    "accessKey": "",
+    "secretAccessKey": ""
+  },
   "db": {
-    "username": "guest",
-    "password": "guest",
-    "host": ""
+    "host": "127.0.0.1",
+    "user": "gandalf",
+    "password": "gandalf",
+    "database": "gandalf",
+    "port": 8400
+  },
+
+  "docker": {
+    "user": "gandalf",
+    "password": "gandalf",
+    "database": "gandalf",
+    "port": 5432,
+    "host": "database"
   }
 }
