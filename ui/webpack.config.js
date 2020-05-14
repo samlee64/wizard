@@ -4,7 +4,7 @@ const merge = require("webpack-merge");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 var MODE =
   process.env.npm_lifecycle_event === "prod" ? "production" : "development";
@@ -99,7 +99,7 @@ if (MODE === "development") {
       historyApiFallback: true,
       // feel free to delete this section if you don't need anything like this
       before(app) {
-        // on port 3000
+        // on port 3001
         app.get("/test", function(req, res) {
           res.json({ result: "OK" });
         });

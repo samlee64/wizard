@@ -11,11 +11,11 @@
 Within the `/server`: 
 Add AWS keys to config.docker.json
 
-npm install 
-docker login
-./scripts/docker.sh
-docker-compose up -d 
-./scripts/migrate up
+`npm install`
+`docker login`
+`./scripts/docker.sh`
+`npm run up`
+`./scripts/migrate up`
 
 `curl localhost:3000/health` to ensure that the server is up 
 
@@ -38,5 +38,6 @@ Remove "app" from docker-compose.yaml
 `curl localhost:3000/health` to ensure that the server is up 
 
 ## UI
-npm run dev
+`npm install`
+`npm run dev`
 

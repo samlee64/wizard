@@ -24,8 +24,6 @@ import View.WebData exposing (viewWebData)
 
 type Msg
     = NoOp
-    | LoadedMetadata
-    | LoadGif
     | LoadedGif (WebData (List Gif))
     | NextPage
     | PrevPage
@@ -95,12 +93,6 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
-            ( model, Cmd.none )
-
-        LoadedMetadata ->
-            ( model, Cmd.none )
-
-        LoadGif ->
             ( model, Cmd.none )
 
         LoadedGif resp ->

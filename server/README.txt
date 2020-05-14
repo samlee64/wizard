@@ -4,12 +4,11 @@ How to run
 TODOs
 Don't hold the whole getObject buffer in memory (low priority)
 
-dockerize (halfway done, need to replace the config.json when creating the dockerfile so have the proper db configs)
 dockerize UI
 
-filter out the id from the tags
+filter out the id from the tags when ingesting
 
-FIX sever type naming
+FIX server type naming
 create some indexes
 
 FIX multiple sync add tag duplicates
@@ -17,6 +16,3 @@ FIX multiple sync add tag duplicates
 Make UI prettier
 
 add in total num pages
-
-write how to run
-
