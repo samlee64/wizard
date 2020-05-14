@@ -10,6 +10,9 @@ import Page.Index as Index
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.page ) of
+        ( NoOp, _ ) ->
+            ( model, Cmd.none )
+
         ( UrlRequest urlRequest, _ ) ->
             --TODO(sam)
             ( model, Cmd.none )
@@ -20,7 +23,6 @@ update msg model =
 
         ( IndexMsg imsg, IndexPage imodel ) ->
             Index.update imsg imodel |> updatePage IndexPage IndexMsg model
-
 
         _ ->
             ( model, Cmd.none )

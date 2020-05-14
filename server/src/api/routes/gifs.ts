@@ -12,9 +12,8 @@ router.get("/", async (ctx: Context) => {
   let query;
   try {
     query = {
-      id: ctx.query.id as string | undefined,
       tags: ctx.query.tags ? JSON.parse(ctx.query.tags) : undefined,
-      page: JSON.parse(ctx.query.page),
+      page: ctx.query.page ? JSON.parse(ctx.query.page) : 0,
     };
   } catch (e) {
     ctx.status = 400;

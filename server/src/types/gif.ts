@@ -1,3 +1,5 @@
+import {Pagination } from './utils'
+
 export interface GifMetadata {
   id: string;
   tags: string[];
@@ -9,11 +11,8 @@ export interface Gif {
   fileName: string;
 }
 
-export interface Queryable {
+interface Queryable {
   tags: string[] | undefined;
-  id: string | undefined;
 }
 
-export interface GifQuery extends Queryable {
-  page: number;
-}
+export interface GifQuery extends Queryable, Pagination {}

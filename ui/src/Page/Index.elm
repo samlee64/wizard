@@ -1,14 +1,24 @@
 module Page.Index exposing (..)
 
+import Bootstrap.Badge as Badge
+import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as CardBlock
+import Bootstrap.Form.Input as Input
+import Bootstrap.Grid as Grid
+import Bootstrap.Navbar as Navbar
 import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.Utilities.Spacing as Spacing
+import Extra.Extra as Extra
 import Extra.Html as EH
 import Flags exposing (Flags)
 import Html exposing (..)
-import Html.Attributes exposing (autoplay, loop, src)
+import Html.Attributes exposing (attribute, autoplay, id, loop, placeholder, property, src, style, width)
+import Html.Events exposing (onClick)
+import Json.Encode as Encode
 import RemoteData as RD exposing (RemoteData(..), WebData)
-import Request.Gif exposing (Gif, GifQuery, getGifs)
+import Request.Gif as RequestGif exposing (Gif, GifQuery)
+import Set exposing (Set)
 
 
 type Msg
@@ -16,31 +26,63 @@ type Msg
     | LoadedMetadata
     | LoadGif
     | LoadedGif (WebData (List Gif))
-    | HandleSearchInput
+    | NextPage
+    | PrevPage
+    | SelectTag String
+    | ClearTags
 
 
 type alias Model =
     { flags : Flags
     , page : Int
-    , searchInput : String
+    , selectedTags : Set String
     , gifs : WebData (List Gif)
     }
 
 
-defaultGifQuery : GifQuery
-defaultGifQuery =
-    { page = 0, tags = Nothing, id = Nothing }
+extractGifQuery : Model -> GifQuery
+extractGifQuery model =
+    let
+        tags =
+            if Set.isEmpty model.selectedTags then
+                Nothing
+
+            else
+                Just <| Set.toList model.selectedTags
+    in
+    { page = model.page
+    , tags = tags
+    }
+
+
+defaultGifWidth : Int
+defaultGifWidth =
+    300
+
+
+getGifs : Model -> ( Model, Cmd Msg )
+getGifs model =
+    let
+        cmd =
+            RequestGif.getGifs model.flags (extractGifQuery model) LoadedGif
+
+        updatedModel =
+            { model | gifs = Loading }
+    in
+    ( updatedModel, cmd )
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { flags = flags
-      , page = 0
-      , searchInput = ""
-      , gifs = Loading
-      }
-    , getGifs flags defaultGifQuery LoadedGif
-    )
+    let
+        model =
+            { flags = flags
+            , page = 0
+            , selectedTags = Set.empty
+            , gifs = Loading
+            }
+    in
+    model |> getGifs
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,8 +100,21 @@ update msg model =
         LoadedGif resp ->
             ( { model | gifs = resp }, Cmd.none )
 
-        HandleSearchInput ->
-            ( model, Cmd.none )
+        PrevPage ->
+            let
+                prevPage =
+                    max 0 (model.page - 1)
+            in
+            { model | page = prevPage } |> getGifs
+
+        NextPage ->
+            { model | page = model.page + 1 } |> getGifs
+
+        SelectTag tag ->
+            { model | selectedTags = Set.insert tag model.selectedTags } |> getGifs
+
+        ClearTags ->
+            ( { model | selectedTags = Set.empty }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -70,29 +125,105 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div []
-        [ text "SIKE its a SPIKE"
-        , viewGifs model
+        [ viewGifs model
+        , viewPaginationButtons
+        , Button.button [ Button.warning, Button.onClick ClearTags ] [ text "Clear Selected Tags" ]
         ]
 
 
 viewGifs : Model -> Html Msg
 viewGifs model =
     model.gifs
-        |> RD.map (List.map (viewGif model.flags))
+        |> RD.map (List.map (viewGif model.flags model))
         |> RD.withDefault [ text "error" ]
-        |> div [ Flex.block, Flex.row ]
+        |> div [ Flex.block ]
 
 
-viewGif : Flags -> Gif -> Html Msg
-viewGif flags gif =
-    Card.config []
-        |> Card.header [] [ text gif.id ]
-        |> Card.block []
-            [ CardBlock.custom <|
-                div []
-                    [ video
-                        [ autoplay True, loop True ]
-                        [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
+viewGif : Flags -> Model -> Gif -> Html Msg
+viewGif flags model gif =
+    div []
+        [ video
+            [ id gif.id, width defaultGifWidth, autoplay True, loop True ]
+            [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
+        , viewTags model gif.tags
+        ]
+
+
+viewTags : Model -> List String -> Html Msg
+viewTags model tags =
+    let
+        viewTag tag =
+            Set.member tag model.selectedTags
+                |> Extra.ternary Badge.badgePrimary Badge.badgeSecondary
+                |> (\b -> b [ style "cursor" "pointer", onClick (SelectTag tag) ] [ text tag ])
+    in
+    tags
+        |> List.map viewTag
+        |> div []
+
+
+viewPaginationButtons : Html Msg
+viewPaginationButtons =
+    div []
+        [ Button.button [ Button.primary, Button.onClick PrevPage ] [ text "Prev Page" ]
+        , Button.button [ Button.primary, Button.onClick NextPage ] [ text "Next Page" ]
+        ]
+
+
+
+{-
+   viewGif : Flags -> Gif -> Html Msg
+   viewGif flags gif =
+       Card.config []
+           |> Card.header [] [ text gif.id ]
+           |> Card.block []
+               [ CardBlock.custom <|
+                   div []
+                       [ video
+                           [ autoplay True, loop True ]
+                           [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
+                       ]
+               ]
+           |> Card.view
+-}
+
+
+viewNavbar : Html Msg
+viewNavbar =
+    let
+        ( mockedState, cMsg ) =
+            Navbar.initialState (\_ -> NoOp)
+    in
+    --Ripped from elm-bootstrap.info/navbar
+    Grid.container []
+        -- Wrap in a container to center the navbar
+        [ Navbar.config (\_ -> NoOp)
+            |> Navbar.withAnimation
+            |> Navbar.collapseMedium
+            -- Collapse menu at the medium breakpoint
+            |> Navbar.info
+            -- Customize coloring
+            |> Navbar.brand
+                -- Add logo to your brand with a little styling to align nicely
+                []
+                [ img
+                    [ src "elm-bootstrap.svg"
+                    , property "className" (Encode.string "d-inline-block align-top")
+                    , width 30
                     ]
-            ]
-        |> Card.view
+                    []
+                , text " Elm Bootstrap"
+                ]
+            |> Navbar.customItems
+                [ Navbar.formItem []
+                    [ Input.text [ Input.attrs [ placeholder "search" ] ]
+                    , Button.button
+                        [ Button.success
+                        , Button.attrs [ Spacing.ml2Sm ]
+                        ]
+                        [ text "Search" ]
+                    ]
+                , Navbar.textItem [ Spacing.ml2Sm, property "className" (Encode.string "muted") ] [ text "Text" ]
+                ]
+            |> Navbar.view mockedState
+        ]

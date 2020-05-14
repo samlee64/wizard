@@ -9,3 +9,4 @@ type Msg
     = UrlChange Url
     | UrlRequest UrlRequest
     | IndexMsg Index.Msg
+    | NoOp
