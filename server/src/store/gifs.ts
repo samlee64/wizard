@@ -3,7 +3,7 @@ import { map } from "bluebird";
 
 import { GifMetadata, GifQuery } from "../types/gif";
 import { Connection } from "../db";
-import { GIFS, concurrency, PAGE_SIZE , TAGS} from "./constants";
+import { GIFS, concurrency, PAGE_SIZE, TAGS } from "./constants";
 import { insertTags } from "./tags";
 
 //Allow for these to throw
@@ -19,24 +19,31 @@ export async function getGifs(
   //if there is nothing, return the og page size with how many more there are
   const offset = query.page * PAGE_SIZE;
 
-  console.log(query.tags)
+  console.log(query.tags);
+
+  const baseQuery = conn(`${GIFS} as g`)
+    .innerJoin(`${TAGS} as t`, "g.id", "t.gif_id")
+    .select(["g.id", conn.raw("ARRAY_AGG(t.tag) as tags")])
+    .groupBy("g.id");
 
   if (query.tags) {
-  return await conn(`${GIFS} as g`)
-  //.innerJoin(`${TAGS} as t`, 'g.id', 't.gif_id')
-  .joinRaw(`inner join ${TAGS} as t on g.id = t.gif_id and t.tag in (?)`, query.tags)
-  .select(['g.id', conn.raw('ARRAY_AGG(t.tag) as tags')]).groupBy('g.id')
-  .offset(offset).limit(PAGE_SIZE);
+    const matchingGifsQuery = conn(`${GIFS} as g`)
+      .select("gif_id")
+      .innerJoin(`${TAGS} as t`, "g.id", "t.gif_id")
+      .whereIn("t.tag", query.tags)
+      .toString();
+    const sqlQuery = `with matching_gifs as
+          (${matchingGifsQuery})
+       , all_gifs as
+          (${baseQuery})
+     select * from all_gifs as ag inner join matching_gifs as mg on ag.id = mg.gif_id offset ? limit ? `;
 
+    const ret = await conn.raw(sqlQuery, [offset, PAGE_SIZE]);
 
-
+    return ret.rows;
   } else {
-  return await conn(`${GIFS} as g`)
-  .innerJoin(`${TAGS} as t`, 'g.id', 't.gif_id')
-  .select(['g.id', conn.raw('ARRAY_AGG(t.tag) as tags')]).groupBy('g.id')
-  .offset(offset).limit(PAGE_SIZE);
+    return await baseQuery.offset(offset).limit(PAGE_SIZE);
   }
-
 }
 
 export async function upsertGif(

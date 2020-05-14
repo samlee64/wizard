@@ -14,8 +14,9 @@ create some indexes
 
 FIX multiple sync add tag duplicates
 
-Make UI pretty
-Add search by tag
-Add tags to Gif interface
+Make UI prettier
 
 add in total num pages
+
+write how to run
+
