@@ -4,6 +4,7 @@
     "user": "gandalf",
     "password": "gandalf",
     "host": "127.0.0.1",
-    "database": "gandalf"
+    "database": "gandalf",
+    "port":  8400
   }
 }
