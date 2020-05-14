@@ -3,3 +3,8 @@ export interface GifMetadata {
   tags: string[];
   "File Name": string;
 }
+
+export interface Gif {
+  id: string;
+  fileName: string;
+}

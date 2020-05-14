@@ -5,7 +5,7 @@ create table gifs (
 );
 
 create table tags (
-  name varchar not null,
+  tag varchar not null,
   gif_id varchar not null,
   foreign key (gif_id) references gifs (id)
 );
