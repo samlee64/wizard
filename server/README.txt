@@ -18,4 +18,4 @@ Make UI pretty
 Add search by tag
 Add tags to Gif interface
 
-pagination
+add in total num pages

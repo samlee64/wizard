@@ -1,4 +1,4 @@
-import {Pagination } from './utils'
+import { Pagination } from "./utils";
 
 export interface GifMetadata {
   id: string;

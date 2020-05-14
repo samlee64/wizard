@@ -19,6 +19,7 @@ import Json.Encode as Encode
 import RemoteData as RD exposing (RemoteData(..), WebData)
 import Request.Gif as RequestGif exposing (Gif, GifQuery)
 import Set exposing (Set)
+import View.WebData exposing (viewWebData)
 
 
 type Msg
@@ -28,7 +29,7 @@ type Msg
     | LoadedGif (WebData (List Gif))
     | NextPage
     | PrevPage
-    | SelectTag String
+    | ToggleTag String
     | ClearTags
 
 
@@ -58,6 +59,11 @@ extractGifQuery model =
 defaultGifWidth : Int
 defaultGifWidth =
     300
+
+
+resetPage : Model -> Model
+resetPage model =
+    { model | page = 0 }
 
 
 getGifs : Model -> ( Model, Cmd Msg )
@@ -110,11 +116,27 @@ update msg model =
         NextPage ->
             { model | page = model.page + 1 } |> getGifs
 
-        SelectTag tag ->
-            { model | selectedTags = Set.insert tag model.selectedTags } |> getGifs
+        ToggleTag tag ->
+            let
+                selectedTags =
+                    if Set.member tag model.selectedTags then
+                        Set.remove tag model.selectedTags
+
+                    else
+                        Set.insert tag model.selectedTags
+            in
+            { model | selectedTags = selectedTags }
+                |> resetPage
+                |> getGifs
 
         ClearTags ->
-            ( { model | selectedTags = Set.empty }, Cmd.none )
+            if Set.isEmpty model.selectedTags then
+                ( model, Cmd.none )
+
+            else
+                { model | selectedTags = Set.empty }
+                    |> resetPage
+                    |> getGifs
 
 
 subscriptions : Model -> Sub Msg
@@ -126,27 +148,38 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewGifs model
-        , viewPaginationButtons
-        , Button.button [ Button.warning, Button.onClick ClearTags ] [ text "Clear Selected Tags" ]
+        , div [ Flex.row, Flex.block ]
+            [ viewPaginationButtons model
+            , Button.button [ Button.attrs [ Spacing.ml5 ], Button.warning, Button.onClick ClearTags ] [ text "Clear Selected Tags" ]
+            ]
         ]
 
 
 viewGifs : Model -> Html Msg
 viewGifs model =
-    model.gifs
-        |> RD.map (List.map (viewGif model.flags model))
-        |> RD.withDefault [ text "error" ]
-        |> div [ Flex.block ]
+    let
+        v gifs =
+            gifs
+                |> List.map (viewGif model.flags model)
+                |> div [ Flex.block, Flex.row, Flex.wrap, Flex.alignItemsCenter, Flex.justifyBetween ]
+    in
+    viewWebData v model.gifs
 
 
 viewGif : Flags -> Model -> Gif -> Html Msg
 viewGif flags model gif =
-    div []
-        [ video
-            [ id gif.id, width defaultGifWidth, autoplay True, loop True ]
-            [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
-        , viewTags model gif.tags
-        ]
+    Card.config []
+        |> Card.header [] []
+        |> Card.block []
+            [ CardBlock.custom <|
+                video
+                    [ id gif.id, width defaultGifWidth, autoplay True, loop True ]
+                    [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
+            ]
+        |> Card.footer []
+            [ viewTags model gif.tags
+            ]
+        |> Card.view
 
 
 viewTags : Model -> List String -> Html Msg
@@ -155,75 +188,17 @@ viewTags model tags =
         viewTag tag =
             Set.member tag model.selectedTags
                 |> Extra.ternary Badge.badgePrimary Badge.badgeSecondary
-                |> (\b -> b [ style "cursor" "pointer", onClick (SelectTag tag) ] [ text tag ])
+                |> (\b -> b [ style "cursor" "pointer", onClick (ToggleTag tag) ] [ text tag ])
     in
     tags
         |> List.map viewTag
         |> div []
 
 
-viewPaginationButtons : Html Msg
-viewPaginationButtons =
-    div []
-        [ Button.button [ Button.primary, Button.onClick PrevPage ] [ text "Prev Page" ]
-        , Button.button [ Button.primary, Button.onClick NextPage ] [ text "Next Page" ]
-        ]
-
-
-
-{-
-   viewGif : Flags -> Gif -> Html Msg
-   viewGif flags gif =
-       Card.config []
-           |> Card.header [] [ text gif.id ]
-           |> Card.block []
-               [ CardBlock.custom <|
-                   div []
-                       [ video
-                           [ autoplay True, loop True ]
-                           [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
-                       ]
-               ]
-           |> Card.view
--}
-
-
-viewNavbar : Html Msg
-viewNavbar =
-    let
-        ( mockedState, cMsg ) =
-            Navbar.initialState (\_ -> NoOp)
-    in
-    --Ripped from elm-bootstrap.info/navbar
-    Grid.container []
-        -- Wrap in a container to center the navbar
-        [ Navbar.config (\_ -> NoOp)
-            |> Navbar.withAnimation
-            |> Navbar.collapseMedium
-            -- Collapse menu at the medium breakpoint
-            |> Navbar.info
-            -- Customize coloring
-            |> Navbar.brand
-                -- Add logo to your brand with a little styling to align nicely
-                []
-                [ img
-                    [ src "elm-bootstrap.svg"
-                    , property "className" (Encode.string "d-inline-block align-top")
-                    , width 30
-                    ]
-                    []
-                , text " Elm Bootstrap"
-                ]
-            |> Navbar.customItems
-                [ Navbar.formItem []
-                    [ Input.text [ Input.attrs [ placeholder "search" ] ]
-                    , Button.button
-                        [ Button.success
-                        , Button.attrs [ Spacing.ml2Sm ]
-                        ]
-                        [ text "Search" ]
-                    ]
-                , Navbar.textItem [ Spacing.ml2Sm, property "className" (Encode.string "muted") ] [ text "Text" ]
-                ]
-            |> Navbar.view mockedState
+viewPaginationButtons : Model -> Html Msg
+viewPaginationButtons { page } =
+    div [ Flex.row ]
+        [ Button.button [ Button.attrs [ Spacing.ml2 ], Button.primary, Button.onClick PrevPage ] [ text "Prev Page" ]
+        , span [ Spacing.ml2 ] [ text <| "Page: " ++ String.fromInt page ]
+        , Button.button [ Button.attrs [ Spacing.ml2 ], Button.primary, Button.onClick NextPage ] [ text "Next Page" ]
         ]
