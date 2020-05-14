@@ -3,9 +3,7 @@ import * as bodyParser from "koa-bodyparser";
 import * as json from "koa-json";
 import router from "./routes";
 import config from "../config";
-
-//tslint: disable-next-line
-const cors = require("@koa/cors");
+import * as cors from "@koa/cors";
 
 const app = new Koa();
 

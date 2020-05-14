@@ -1,15 +1,27 @@
 import { format } from "util";
 import { map } from "bluebird";
 
-import { GifMetadata } from "../types/gif";
+import { GifMetadata, GifQuery } from "../types/gif";
 import { Connection } from "../db";
-import { GIFS, concurrency } from "./constants";
+import { GIFS, concurrency, PAGE_SIZE } from "./constants";
 import { insertTags } from "./tags";
 
 //Allow for these to throw
-//export async function getGif(conn: Connection, query: GifQuery): Promise<void> {
-//  conn.raw()
-//}
+
+export async function getGifs(
+  conn: Connection,
+  query: GifQuery
+): Promise<{ id: string }[]> {
+  //if there is an id, return that 1
+  //if there are tags, return ones that match that tag
+  //if there are both, return the id
+
+  //if there is nothing, return the og page size with how many more there are
+  const offset = query.page * PAGE_SIZE;
+
+  return await conn(GIFS).offset(offset).limit(PAGE_SIZE);
+}
+
 export async function upsertGif(
   conn: Connection,
   meta: GifMetadata

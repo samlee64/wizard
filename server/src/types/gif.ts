@@ -10,10 +10,10 @@ export interface Gif {
 }
 
 export interface Queryable {
-  tags: string[];
-  id: string;
+  tags: string[] | undefined;
+  id: string | undefined;
 }
 
-export interface GifQuery extends Partial<Queryable> {
+export interface GifQuery extends Queryable {
   page: number;
 }

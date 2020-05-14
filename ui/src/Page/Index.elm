@@ -1,6 +1,8 @@
 module Page.Index exposing (..)
 
 import Bootstrap.Card as Card
+import Bootstrap.Card.Block as CardBlock
+import Bootstrap.Utilities.Flex as Flex
 import Extra.Html as EH
 import Flags exposing (Flags)
 import Html exposing (..)
@@ -66,25 +68,31 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view _ =
+view model =
     div []
         [ text "SIKE its a SPIKE"
-
-        --, video [ autoplay True, loop True ] [ source [ src "http://wizard-fullstack-test.s3-us-west-2.amazonaws.com/gifs/UnxdQO00tFl7jEqMPa.mp4" ] [] ]
+        , viewGifs model
         ]
 
 
 viewGifs : Model -> Html Msg
 viewGifs model =
     model.gifs
-        |> RD.map (List.map viewGif)
+        |> RD.map (List.map (viewGif model.flags))
         |> RD.withDefault [ text "error" ]
-        |> div []
+        |> div [ Flex.block, Flex.row ]
 
 
-viewGif : Gif -> Html Msg
-viewGif gif =
+viewGif : Flags -> Gif -> Html Msg
+viewGif flags gif =
     Card.config []
-        |> Card.header [] []
-        |> Card.block [] []
+        |> Card.header [] [ text gif.id ]
+        |> Card.block []
+            [ CardBlock.custom <|
+                div []
+                    [ video
+                        [ autoplay True, loop True ]
+                        [ source [ src <| flags.bucket ++ gif.id ++ ".mp4" ] [] ]
+                    ]
+            ]
         |> Card.view
