@@ -28,7 +28,8 @@
     "koa-bodyparser": "^4.3.0",
     "koa-json": "^2.0.2",
     "koa-router": "^8.0.8",
-    "pg": "^8.2.0"
+    "pg": "^8.2.0",
+    "util": "^0.12.3"
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",

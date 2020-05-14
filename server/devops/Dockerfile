@@ -1,5 +1,4 @@
 FROM node:10 as build
-
 WORKDIR /usr/app
 
 COPY package*.json ./
@@ -11,11 +10,10 @@ RUN npm run transpile
 
 
 FROM node:10 as run
+WORKDIR /usr/app
 
 COPY package*.json ./
 RUN npm ci --only=production
-
-WORKDIR /usr/app
 
 COPY --from=build /usr/app/lib  /usr/app/lib
 EXPOSE 3000

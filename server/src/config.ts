@@ -14,6 +14,7 @@ export interface Config {
 }
 
 //TODO read in AWS keys as env vars
+//tslint:disable-next-line
 const config: Config = require("../config.json");
 
 export default config;

@@ -10,6 +10,6 @@ export const conn = Knex({
     password: config.db.password,
     database: config.db.database,
     port: config.db.port,
-    host: config.db.host
+    host: config.db.host,
   },
 });
