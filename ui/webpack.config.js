@@ -110,21 +110,7 @@ if (MODE === "development") {
 if (MODE === "production") {
   console.log("Building for Production...");
   module.exports = merge(common, {
-    plugins: [
-      // Delete everything from /dist directory and report to user
-      new CleanWebpackPlugin(["dist"], {
-        root: __dirname,
-        exclude: [],
-        verbose: true,
-        dry: false
-      }),
-      // Copy static assets
-      new CopyWebpackPlugin([
-        {
-          from: "src/assets"
-        }
-      ]),
-    ],
+    plugins: [],
     module: {
       rules: [
         {

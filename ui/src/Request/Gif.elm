@@ -38,7 +38,6 @@ getGifs flags query msg =
         sam =
             query.tags
                 |> Maybe.map (\tas -> tas |> List.map (\ta -> Encode.encode 0 (Encode.string ta)))
-                |> Debug.log "here"
 
         tags =
             query.tags
