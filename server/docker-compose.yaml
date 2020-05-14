@@ -13,7 +13,7 @@ services:
   app:
     image: "gandalf:latest"
     ports:
-      - "4000:3000"
+      - "3000:3000"
     links:
       - "postgres:database"
     depends_on:

@@ -1,21 +1,42 @@
-Full Stack Developer Test
-https://wizard-fullstack-test.s3-us-west-2.amazonaws.com/README.txt
-
-Write a complete gif search product.  The following should be included:
-
 1.  A website that displays gifs, and the ability to search for gifs
 2.  A backend rest api that will fullfil requests from the website
 3.  A database that has the gif metadata to provide for the backend.
 4.  All systems should be contained in docker container(s)
 5.  The project will be submitted via a link to github where it can be checked out.
 
-The gif metadata is available in gifs.json file.  This is included but also can
-be downloaded from:
-https://wizard-fullstack-test.s3-us-west-2.amazonaws.com/gifs.json
+# To Run
 
-All gifs are mp4 files that can be downloaded from the following folder:
-https://wizard-fullstack-test.s3-us-west-2.amazonaws.com/gifs/
+## Server
+### For Use
+Within the `/server`: 
+Add AWS keys to config.docker.json
+
+npm install 
+docker login
+./scripts/docker.sh
+docker-compose up -d 
+./scripts/migrate up
+
+`curl localhost:3000/health` to ensure that the server is up 
 
 
-If there is any questions, feel free to call me, Steven Sandoval, at 714-204-2141 or
-email me at ss@wizardlabs.gg
+### For Development
+Within the `/server`
+
+`cp config.sample.json config.json`
+Add AWS keys to config.json
+
+`npm install` 
+`npm run start:watch`
+
+Remove "app" from docker-compose.yaml
+
+`docker-compose up -d`
+`./scripts/migrate up`
+`npm run start:watch`
+
+`curl localhost:3000/health` to ensure that the server is up 
+
+## UI
+npm run dev
+
