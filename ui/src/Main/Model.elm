@@ -32,7 +32,9 @@ initPage : Url -> Model -> ( Model, Cmd Msg )
 initPage url model =
     case Routes.fromUrl url of
         Just Routes.Index ->
-            Index.init |> updatePage IndexPage IndexMsg model
+            model.flags
+                |> Index.init
+                |> updatePage IndexPage IndexMsg model
 
         Nothing ->
             ( { model | page = NotFound }, Cmd.none )
