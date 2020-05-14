@@ -1,7 +1,9 @@
 *.swp
 *.swo
+.DS_STORE
 node_modules/
 server/lib/
 server/src/config.ts
 config.json
 .bic_cache
+elm-stuff/

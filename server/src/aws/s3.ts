@@ -23,6 +23,7 @@ export async function getGifMetadata(): Promise<GifMetadata[]> {
 
     //Going to hold whole buffer in memory.
     ////should ideally have io-ts
+    //tslint:disable-next-line
     const json: { [id: string]: GifMetadata } = JSON.parse(
       metadata.Body.toString("utf-8")
     );
