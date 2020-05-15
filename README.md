@@ -18,6 +18,7 @@ Add AWS keys to config.docker.json
 `./scripts/migrate up`
 
 `curl localhost:3000/health` to ensure that the server is up 
+`curl localhost:3000/sync` once to download the gif metadata and populate the database
 
 
 ### For Development
@@ -39,5 +40,7 @@ Remove "app" from docker-compose.yaml
 
 ## UI
 `npm install`
+`cp config.sample.json config.json`
 `npm run dev`
 
+Navigate to `localhost:3001` 
