@@ -7,3 +7,4 @@ server/src/config.ts
 config.json
 .bic_cache
 elm-stuff/
+ui/public

@@ -12,9 +12,9 @@ var filename = MODE == "production" ? "[name]-[hash].js" : "index.js";
 
 var common = {
   mode: MODE,
-  entry: "./public/index.js",
+  entry: "./src/index.js",
   output: {
-    path: path.join(__dirname, "dist"),
+    path: path.join(__dirname, "public"),
     publicPath: "/",
     // webpack -p automatically adds hash when building for production
     filename: filename
@@ -22,7 +22,7 @@ var common = {
   plugins: [
     new HTMLWebpackPlugin({
       // Use this template to get basic responsive meta tags
-      template: "public/index.html",
+      template: "src/index.html",
       // inject details of output file at end of body
       inject: "body"
     })
@@ -110,7 +110,15 @@ if (MODE === "development") {
 if (MODE === "production") {
   console.log("Building for Production...");
   module.exports = merge(common, {
-    plugins: [],
+    plugins: [
+            // Delete everything from output-path (/dist) and report to user
+            new CleanWebpackPlugin({
+                root: __dirname,
+                exclude: [],
+                verbose: true,
+                dry: false
+            }),
+    ],
     module: {
       rules: [
         {
