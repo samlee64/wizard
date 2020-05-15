@@ -4,8 +4,6 @@ How to run
 TODOs
 Don't hold the whole getObject buffer in memory (low priority)
 
-dockerize UI
-
 filter out the id from the tags when ingesting
 
 FIX server type naming

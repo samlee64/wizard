@@ -39,6 +39,7 @@ Remove "app" from docker-compose.yaml
 `curl localhost:3000/health` to ensure that the server is up 
 
 ## UI
+`cp config.sample.json config.json`
 `./scripts/docker.sh`
 
 Navigate to `localhost:3001` 
